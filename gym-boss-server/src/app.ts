@@ -7,10 +7,10 @@ import helmet from 'helmet';
 import hpp from 'hpp';
 import morgan from 'morgan';
 import { NODE_ENV, PORT, LOG_FORMAT, ORIGIN, CREDENTIALS } from '@config';
-import { dbConnection } from '@database';
+import { connectDB } from '@database';
 import { Routes } from '@interfaces/routes.interface';
 import { ErrorMiddleware } from '@middlewares/error.middleware';
-import { logger, stream } from '@utils/logger';
+import { logger } from '@utils/logger';
 
 export class App {
   public app: express.Application;
@@ -30,10 +30,9 @@ export class App {
 
   public listen() {
     this.app.listen(this.port, () => {
-      console.log("aaaa");
       logger.info(`=================================`);
       logger.info(`======= ENV: ${this.env} =======`);
-      logger.info(`🚀 App listening on the port ${this.port}`);
+      logger.info(`Server is listening on port: ${this.port}`);
       logger.info(`=================================`);
     });
   }
@@ -43,11 +42,11 @@ export class App {
   }
 
   private async connectToDatabase() {
-    await dbConnection();
+    await connectDB();
   }
 
   private initializeMiddlewares() {
-    this.app.use(morgan(LOG_FORMAT, { stream }));
+    this.app.use(morgan(LOG_FORMAT));
     this.app.use(cors({ origin: ORIGIN, credentials: CREDENTIALS }));
     this.app.use(hpp());
     this.app.use(helmet());

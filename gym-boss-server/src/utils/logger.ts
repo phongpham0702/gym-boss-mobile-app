@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import winston from 'winston';
@@ -27,15 +28,15 @@ const logger = winston.createLogger({
   ),
   transports: [
     // debug log setting
-    new winstonDaily({
-      level: 'debug',
-      datePattern: 'YYYY-MM-DD',
-      dirname: logDir + '/debug', // log file /logs/debug/*.log in save
-      filename: `%DATE%.log`,
-      maxFiles: 30, // 30 Days saved
-      json: false,
-      zippedArchive: true,
-    }),
+    // new winstonDaily({
+    //   level: 'debug',
+    //   datePattern: 'YYYY-MM-DD',
+    //   dirname: logDir + '/debug', // log file /logs/debug/*.log in save
+    //   filename: `%DATE%.log`,
+    //   maxFiles: 30, // 30 Days saved
+    //   json: false,
+    //   zippedArchive: true,
+    // }),
     // error log setting
     new winstonDaily({
       level: 'error',
@@ -52,14 +53,14 @@ const logger = winston.createLogger({
 
 logger.add(
   new winston.transports.Console({
-    format: winston.format.combine(winston.format.splat(), winston.format.colorize()),
-  }),
+    level: "silly",
+    format: winston.format.combine(
+      winston.format.splat(), 
+      winston.format.colorize({all: true}),
+      winston.format.label({label:"[Logger]"}),
+      winston.format.printf((info) => `${info.label} ${info.timestamp} [${info.level}]: ${info.message}`),
+   
+  )}), 
 );
 
-const stream = {
-  write: (message: string) => {
-    logger.info(message.substring(0, message.lastIndexOf('\n')));
-  },
-};
-
-export { logger, stream };
+export { logger };
