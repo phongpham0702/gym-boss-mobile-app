@@ -21,7 +21,6 @@ export class App {
     this.app = express();
     this.env = NODE_ENV || 'development';
     this.port = PORT || 3000;
-
     this.connectToDatabase();
     this.initializeMiddlewares();
     this.initializeRoutes(routes);
@@ -58,8 +57,10 @@ export class App {
 
   private initializeRoutes(routes: Routes[]) {
     routes.forEach(route => {
+      
       this.app.use('/', route.router);
     });
+  
   }
 
   private initializeErrorHandling() {
