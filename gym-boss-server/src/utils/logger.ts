@@ -1,4 +1,4 @@
-/* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import winston from 'winston';
@@ -38,16 +38,16 @@ const logger = winston.createLogger({
     //   zippedArchive: true,
     // }),
     // error log setting
-    new winstonDaily({
-      level: 'error',
-      datePattern: 'YYYY-MM-DD',
-      dirname: logDir + '/error', // log file /logs/error/*.log in save
-      filename: `%DATE%.log`,
-      maxFiles: 30, // 30 Days saved
-      handleExceptions: true,
-      json: false,
-      zippedArchive: true,
-    }),
+    // new winstonDaily({
+    //   level: 'error',
+    //   datePattern: 'YYYY-MM-DD',
+    //   dirname: logDir + '/error', // log file /logs/error/*.log in save
+    //   filename: `%DATE%.log`,
+    //   maxFiles: 30, // 30 Days saved
+    //   handleExceptions: true,
+    //   json: false,
+    //   zippedArchive: true,
+    // }),
   ],
 });
 

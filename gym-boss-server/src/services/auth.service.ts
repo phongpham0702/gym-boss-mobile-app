@@ -2,45 +2,55 @@ import { hash, compare } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
 import { Service } from 'typedi';
 import { SECRET_KEY } from '@config';
-import { HttpException } from '@/exceptions/httpException';
-import { DataStoredInToken, TokenData } from '@interfaces/auth.interface';
+import { HttpException } from '@/exceptions/HttpException';
+import { DataStoredInToken } from '@interfaces/auth.interface';
 import { User } from '@interfaces/users.interface';
 import { UserModel } from '@models/users.model';
+import { SaltRound, TokenExpireTime } from '@/config/auth.config';
+import { UserProfileModel } from '@/models/userprofiles.model';
 
-const createToken = (user: User): TokenData => {
-  const dataStoredInToken: DataStoredInToken = { _id: user._id };
-  const expiresIn: number = 60 * 60;
 
-  return { expiresIn, token: sign(dataStoredInToken, SECRET_KEY, { expiresIn }) };
-}
-
-const createCookie = (tokenData: TokenData): string => {
-  return `Authorization=${tokenData.token}; HttpOnly; Max-Age=${tokenData.expiresIn};`;
-}
+const createToken = (data:DataStoredInToken): string => {
+  const token: string = sign(data, SECRET_KEY, { expiresIn: TokenExpireTime })
+  return token;
+};
 
 @Service()
 export class AuthService {
   public async signup(userData: User): Promise<User> {
     const findUser: User = await UserModel.findOne({ email: userData.email });
-    if (findUser) throw new HttpException(409, `This email ${userData.email} already exists`);
+  
+    if (findUser) throw HttpException.BAD_REQUEST(`This email ${userData.email} already exists`);
 
-    const hashedPassword = await hash(userData.password, 10);
+    const hashedPassword: string = await hash(userData.password, SaltRound);
     const createUserData: User = await UserModel.create({ ...userData, password: hashedPassword });
+    await UserProfileModel.create({email: userData.email})
 
     return createUserData;
   }
-
-  public async login(userData: User): Promise<{ cookie: string; findUser: User }> {
-    const findUser: User = await UserModel.findOne({ email: userData.email });
-    if (!findUser) throw new HttpException(409, `This email ${userData.email} was not found`);
+     
+  public async login(userData: User): Promise<{ token: string; userInfo: object }> {
+    const findUser: User = await UserModel.findOne({ email: userData.email },{__v:0 , createdAt: 0 , updatedAt:0}).lean();
+    if (!findUser) throw HttpException.BAD_REQUEST("Email or password is incorrect");
 
     const isPasswordMatching: boolean = await compare(userData.password, findUser.password);
-    if (!isPasswordMatching) throw new HttpException(409, "Password is not matching");
+    if (!isPasswordMatching) throw HttpException.BAD_REQUEST("Email or password is incorrect");
 
-    const tokenData = createToken(findUser);
-    const cookie = createCookie(tokenData);
+    const findUserProfile = await UserProfileModel.findOne({
+      email: userData.email
+    },{ firstUpdate: 1}).lean()
 
-    return { cookie, findUser };
+    const tokenData:string = findUserProfile.firstUpdate? 
+    createToken({user: findUser , isUpdateProfile: true}):
+    createToken({user: findUser , isUpdateProfile: false});
+
+    return{
+      token: tokenData,
+      userInfo:{
+        _id: findUser._id.toString(),
+        isUpdateProfile: findUserProfile.firstUpdate ? true: false
+      }
+    }
   }
 
   public async logout(userData: User): Promise<User> {

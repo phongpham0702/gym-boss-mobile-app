@@ -1,43 +1,40 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import fitnessGoals from '@/constants/fitnessGoals.const';
 import { registerDecorator, ValidationOptions, ValidationArguments } from 'class-validator';
 
-const MatchPassword = (property: string, validationOptions?: ValidationOptions) => {
-    return function (object: Object, propertyName: string) {
-        registerDecorator({
-            name: "MatchPassword",
-            target: object.constructor,
-            propertyName: property,
-            constraints: [property],
-            options: validationOptions,
-            validator: {
-                validate(value:string, args: ValidationArguments){
-                    console.log(value);
-                    console.log(args);
-                    return false;
-                }
-            }
-        })
-    }
-};
-
-export {
-    MatchPassword
-};
-
-/* export function IsLongerThan(property: string, validationOptions?: ValidationOptions) {
+const MatchPassword = (property: string, validationOptions ?: ValidationOptions) => {
   return function (object: Object, propertyName: string) {
     registerDecorator({
-      name: 'isLongerThan',
+      name: 'MatchPassword',
       target: object.constructor,
-      propertyName: propertyName,
+      propertyName: property,
       constraints: [property],
       options: validationOptions,
       validator: {
-        validate(value: any, args: ValidationArguments) {
-          const [relatedPropertyName] = args.constraints;
-          const relatedValue = (args.object as any)[relatedPropertyName];
-          return typeof value === 'string' && typeof relatedValue === 'string' && value.length > relatedValue.length; // you can return a Promise<boolean> here as well, if you want to make async validation
+        validate(value: string, args: ValidationArguments):boolean {
+          const confirmPassword : string = args.object["confirmPassword"];
+          return value === confirmPassword;
         },
       },
     });
   };
-} */
+};
+
+const IsInFitnessGoalList  = (property: string, validationOptions?: ValidationOptions)=>{
+  return function(object: Object,propertyName: string){
+    registerDecorator({
+      name: 'IsInFitnessGoalList',
+      target:  object.constructor,
+      propertyName: property,
+      constraints:[property],
+      options: validationOptions,
+      validator:{
+        validate(value: number, args: ValidationArguments):boolean{
+          return fitnessGoals.some(goal => goal.id === value);
+        }
+      }
+    })
+  }
+};
+
+export { MatchPassword, IsInFitnessGoalList};

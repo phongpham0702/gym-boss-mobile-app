@@ -1,7 +1,7 @@
 import { plainToInstance } from 'class-transformer';
 import { validateOrReject, ValidationError } from 'class-validator';
 import { NextFunction, Request, Response } from 'express';
-import { HttpException } from '@/exceptions/httpException';
+import { HttpException } from '@/exceptions/HttpException';
 
 /**
  * @name ValidationMiddleware
@@ -15,8 +15,7 @@ import { HttpException } from '@/exceptions/httpException';
 export const ValidationMiddleware = (type: any, skipMissingProperties = false, whitelist = false, forbidNonWhitelisted = false) => {
   return (req: Request, res: Response, next: NextFunction) => {
     const dto = plainToInstance(type, req.body);
-    /* console.log(dto);
-    console.log(type); */
+
     validateOrReject(dto, { skipMissingProperties, whitelist, forbidNonWhitelisted })
       .then(() => {
         req.body = dto;
@@ -24,8 +23,18 @@ export const ValidationMiddleware = (type: any, skipMissingProperties = false, w
       })
       .catch((errors: ValidationError[]) => {
         console.log(errors);
-        const message = errors.map((error: ValidationError) => Object.values(error.constraints)).join(', ');
-        next(new HttpException(400, message));
+        const message = errors.map((error: ValidationError) => 
+        { 
+          const errorData = {
+            property : error.property,
+            value: error.value? error.value : null,
+            errorMessage: Object.values(error.constraints)
+          }
+          if(error.property === "password" || error.property === "confirmPassword") errorData.value = null;
+          return errorData;
+
+        });
+        next(HttpException.BAD_REQUEST(message));
       });
   };
 };

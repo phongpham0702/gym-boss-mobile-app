@@ -6,11 +6,14 @@ import express from 'express';
 import helmet from 'helmet';
 import hpp from 'hpp';
 import morgan from 'morgan';
+import passport from 'passport';
+import session from 'express-session';
 import { NODE_ENV, PORT, LOG_FORMAT, ORIGIN, CREDENTIALS } from '@config';
 import { connectDB } from '@database';
 import { Routes } from '@interfaces/routes.interface';
 import { ErrorMiddleware } from '@middlewares/error.middleware';
 import { logger } from '@utils/logger';
+import { configurePassport } from './config/passport.config';
 
 export class App {
   public app: express.Application;
@@ -43,8 +46,9 @@ export class App {
   private async connectToDatabase() {
     await connectDB();
   }
-
+  
   private initializeMiddlewares() {
+    configurePassport(passport);
     this.app.use(morgan(LOG_FORMAT));
     this.app.use(cors({ origin: ORIGIN, credentials: CREDENTIALS }));
     this.app.use(hpp());
@@ -52,13 +56,22 @@ export class App {
     this.app.use(compression());
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
+    this.app.use(
+      session({
+        secret: "like that huh",
+        resave: false,
+        saveUninitialized: false,
+      })
+    );
     this.app.use(cookieParser());
+    this.app.use(passport.initialize());
+    this.app.use(passport.session());
   }
 
   private initializeRoutes(routes: Routes[]) {
     routes.forEach(route => {
       
-      this.app.use('/', route.router);
+      this.app.use(route.path, route.router);
     });
   
   }

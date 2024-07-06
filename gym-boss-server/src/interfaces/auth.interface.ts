@@ -2,7 +2,8 @@ import { Request } from 'express';
 import { User } from '@interfaces/users.interface';
 
 export interface DataStoredInToken {
-  _id: string;
+  user: User;
+  isUpdateProfile?:boolean;
 }
 
 export interface TokenData {

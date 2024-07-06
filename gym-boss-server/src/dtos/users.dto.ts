@@ -1,18 +1,5 @@
-import { MatchPassword } from '@/decorators/user.decorators';
-import { IsEmail, 
-  IsString, 
-  IsInt,
-  IsNotEmpty, 
-  MinLength, 
-  MaxLength,
-  IsIn, 
-  Max,
-  Min,
-  Equals} from 'class-validator';
-
-
-
-
+import { MatchPassword, IsInFitnessGoalList } from '@/decorators/user.decorators';
+import { IsEmail, IsString, IsInt, IsNotEmpty, MinLength, MaxLength, IsIn, Max, Min} from 'class-validator';
 
 export class CreateUserDto {
   @IsEmail()
@@ -24,32 +11,22 @@ export class CreateUserDto {
   @MaxLength(32)
   public password: string;
 
-
-  @MatchPassword("password")
+  @MinLength(6)
+  @MaxLength(32)
+  @MatchPassword("password",{message: "Confirm password is not match"})
   public confirmPassword: string;
+
+}
+
+export class LoginDto{
+  @IsEmail()
+  public email: string;
 
   @IsString()
   @IsNotEmpty()
-  public userName: string;
-
-  @IsString()
-  @IsIn(["nam",'nữ'])
-  public userGender: string;
-
-  @IsInt()
-  @Min(1)
-  @Max(100)
-  public userAge: number;
-
-  @IsInt()
-  public currentHeight: number;
-
-  @IsInt()
-  public currentWeight: number;
-
-  @IsInt()
-  public fitnessGoalId : number;
+  public password: string;
 }
+
 
 export class UpdateUserDto {
   @IsString()
@@ -58,3 +35,28 @@ export class UpdateUserDto {
   @MaxLength(32)
   public password: string;
 }
+
+
+// @IsString()
+// @IsNotEmpty()
+// public userName: string;
+
+
+// @IsString()
+// @IsIn(['Nam', 'Nữ'])
+// public userGender: string;
+
+// @IsInt()
+// @Min(1)
+// @Max(100)
+// public userAge: number;
+
+// @IsInt()
+// public currentHeight: number;
+
+// @IsInt()
+// public currentWeight: number;
+
+// @IsInt()
+// @IsInFitnessGoalList('fitnessGoalId',{message: "Invalid fitness goal"})
+// public fitnessGoalId: number;

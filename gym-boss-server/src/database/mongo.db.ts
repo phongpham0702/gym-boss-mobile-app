@@ -1,4 +1,4 @@
-/* eslint-disable prettier/prettier */
+
 import mongoose from 'mongoose';
 import { NODE_ENV, DB_URL } from '@config';
 import { logger } from '@/utils/logger';
