@@ -1,5 +1,4 @@
-
-import mongoose from 'mongoose';
+import mongoose, { Mongoose } from 'mongoose';
 import { NODE_ENV, DB_URL } from '@config';
 import { logger } from '@/utils/logger';
 
@@ -29,25 +28,39 @@ const handleEventConnection = connection => {
 
 }
 
+export class MongoDatabase{
+  private connectURL: string = `${DB_URL}`;
+  private connectOption: object = {}
+  private connection: Mongoose;
+  private static instance: MongoDatabase;
 
-export const connectDB = async () => {
-  const connectionConfig = {
-    url: `${DB_URL}`,
-    options: {},
-  };
-
-  if (NODE_ENV !== 'production') {
-    mongoose.set('debug', true);
+  private constructor() {
+    handleEventConnection(mongoose.connection);
+    if (NODE_ENV !== 'production') {
+      mongoose.set('debug', true);
+    }
   }
-
-  handleEventConnection(mongoose.connection);
-
-  try {
-    await mongoose.connect(connectionConfig.url, connectionConfig.options);
-  } catch (error) {
-    console.error(error);
-    process.exit(1);
-  }
-
   
-};
+  public static getInstance(): MongoDatabase{
+    if(!this.instance){
+      this.instance = new MongoDatabase()
+    }
+    return this.instance;
+  }
+
+  public async connectDB() {
+    try {
+      this.connection = await mongoose.connect(this.connectURL,this.connectOption);
+    } 
+    catch (error) {
+      logger.error(error);
+      process.exit(1);
+    }
+    
+  }
+
+  public getConnection():Mongoose{
+    return this.connection;
+  }
+}
+

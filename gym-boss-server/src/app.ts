@@ -9,7 +9,7 @@ import morgan from 'morgan';
 import passport from 'passport';
 import session from 'express-session';
 import { NODE_ENV, PORT, LOG_FORMAT, ORIGIN, CREDENTIALS } from '@config';
-import { connectDB } from '@database';
+import { MongoDatabase } from '@database';
 import { Routes } from '@interfaces/routes.interface';
 import { ErrorMiddleware } from '@middlewares/error.middleware';
 import { logger } from '@utils/logger';
@@ -44,7 +44,8 @@ export class App {
   }
 
   private async connectToDatabase() {
-    await connectDB();
+    const dbInstance = MongoDatabase.getInstance();
+    await dbInstance.connectDB();
   }
   
   private initializeMiddlewares() {
@@ -61,11 +62,12 @@ export class App {
         secret: "like that huh",
         resave: false,
         saveUninitialized: false,
+        
       })
     );
     this.app.use(cookieParser());
     this.app.use(passport.initialize());
-    this.app.use(passport.session());
+    //this.app.use(passport.session());
   }
 
   private initializeRoutes(routes: Routes[]) {

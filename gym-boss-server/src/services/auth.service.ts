@@ -1,19 +1,11 @@
 import { hash, compare } from 'bcrypt';
-import { sign } from 'jsonwebtoken';
 import { Service } from 'typedi';
-import { SECRET_KEY } from '@config';
 import { HttpException } from '@/exceptions/HttpException';
-import { DataStoredInToken } from '@interfaces/auth.interface';
 import { User } from '@interfaces/users.interface';
 import { UserModel } from '@models/users.model';
-import { SaltRound, TokenExpireTime } from '@/config/auth.config';
-import { UserProfileModel } from '@/models/userprofiles.model';
-
-
-const createToken = (data:DataStoredInToken): string => {
-  const token: string = sign(data, SECRET_KEY, { expiresIn: TokenExpireTime })
-  return token;
-};
+import { SaltRound} from '@/config/auth.config';
+import { createAccessToken, createRefreshToken } from '@/utils/token.util.';
+import { DataStoredInToken } from '@/interfaces/auth.interface';
 
 @Service()
 export class AuthService {
@@ -24,35 +16,58 @@ export class AuthService {
 
     const hashedPassword: string = await hash(userData.password, SaltRound);
     const createUserData: User = await UserModel.create({ ...userData, password: hashedPassword });
-    await UserProfileModel.create({email: userData.email})
 
     return createUserData;
   }
-     
-  public async login(userData: User): Promise<{ token: string; userInfo: object }> {
+  
+  public async googleAuthLogin(userEmail:string){
+
+    const findUser: User = await UserModel.findOne({ email: userEmail },{__v:0 , createdAt: 0 , updatedAt:0}).lean();
+    if (!findUser) throw HttpException.SERVER_ERROR();
+
+    const tokenDataPack: DataStoredInToken = {
+      userId: findUser._id,
+      userEmail: findUser.email, 
+      isUpdateProfile: findUser.isUpdatedProfile
+    }
+
+    const accessToken:string = createAccessToken(tokenDataPack);
+    const refreshToken:string = createRefreshToken(tokenDataPack);
+    return{
+      accessToken,
+      refreshToken,
+      isUpdateProfile: findUser.isUpdatedProfile
+    }
+  }
+
+  public async login(userData: User): Promise<{ 
+    accessToken: string; 
+    refreshToken: string; 
+    isUpdateProfile: boolean; 
+  }> 
+  {
     const findUser: User = await UserModel.findOne({ email: userData.email },{__v:0 , createdAt: 0 , updatedAt:0}).lean();
     if (!findUser) throw HttpException.BAD_REQUEST("Email or password is incorrect");
 
     const isPasswordMatching: boolean = await compare(userData.password, findUser.password);
     if (!isPasswordMatching) throw HttpException.BAD_REQUEST("Email or password is incorrect");
 
-    const findUserProfile = await UserProfileModel.findOne({
-      email: userData.email
-    },{ firstUpdate: 1}).lean()
+    const tokenDataPack: DataStoredInToken = {
+      userId: findUser._id,
+      userEmail: findUser.email, 
+      isUpdateProfile: findUser.isUpdatedProfile
+    }
 
-    const tokenData:string = findUserProfile.firstUpdate? 
-    createToken({user: findUser , isUpdateProfile: true}):
-    createToken({user: findUser , isUpdateProfile: false});
+    const accessToken:string = createAccessToken(tokenDataPack);
+    const refreshToken:string = createRefreshToken(tokenDataPack);
 
     return{
-      token: tokenData,
-      userInfo:{
-        _id: findUser._id.toString(),
-        isUpdateProfile: findUserProfile.firstUpdate ? true: false
-      }
+      accessToken,
+      refreshToken,
+      isUpdateProfile: findUser.isUpdatedProfile
     }
   }
-
+  
   public async logout(userData: User): Promise<User> {
     const findUser: User = await UserModel.findOne({ email: userData.email, password: userData.password });
     if (!findUser) throw new HttpException(409, `This email ${userData.email} was not found`);

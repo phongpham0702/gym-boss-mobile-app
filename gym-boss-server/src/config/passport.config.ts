@@ -1,11 +1,12 @@
 import {Strategy as GoogleStrategy, Profile, VerifyCallback} from "passport-google-oauth20";
 import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from '.';
 import { PassportStatic } from "passport";
-import { findUserByEmail } from "@/models/repo/users.repo";
 import { User } from "@/interfaces/users.interface";
-import { UserModel } from "@/models/users.model";
+import Container from "typedi";
+import { AuthService } from "@/services/auth.service";
+import { findUserByEmail } from "@/models/repo/users.repo";
 
-
+const authService = Container.get(AuthService)
 export function configurePassport(passport:PassportStatic){
     passport.use(new GoogleStrategy({
             clientID: GOOGLE_CLIENT_ID,
@@ -13,24 +14,25 @@ export function configurePassport(passport:PassportStatic){
             callbackURL: '/auth/google/callback'
         },
         async (accessToken:string, refreshToken:string, profile: Profile, done: VerifyCallback) => {
-            console.log(profile);
-            console.log(profile.id);
-            
             try {
-               const findUser = await findUserByEmail(profile._json.email);
+
+               const findUser = await findUserByEmail(profile._json.email,{_id:1});
+               console.log(findUser);
                if(!findUser){
                 const newUser: User = {
                     email: profile._json.email,
-                    userName: profile._json.name,
-                    userAvatarURL: profile._json.picture,
+                    password: profile.id,
+                    userName: profile.displayName,
+                    userAvatarURL: profile.photos[0].value
                 }
-                
-
-                await UserModel.create(newUser);
-
+                 
+                await authService.signup(newUser);
+                // await authService.googleAuthSignUp(newUser, newUserProfile);
                }
-            
-                done(null,profile);
+              
+               const loginData = await authService.googleAuthLogin(profile._json.email);
+
+                done(null,loginData);
                
             } catch (error) {
                 done(error)
@@ -39,14 +41,21 @@ export function configurePassport(passport:PassportStatic){
         }
     ))
 
-    passport.serializeUser((user, done) => {
-        done(null, user.id)
-      })
+    // passport.serializeUser((user: Profile, done) => {
+    //     done(null, user._json.email)
+    //   })
     
-      // used to deserialize the user
-      passport.deserializeUser((id, done) => {
-         done(null, "abc")
-      })
+    //   // used to deserialize the user
+    // passport.deserializeUser(async (email:string , done) => {
+
+    // try {
+    //         const findUser = await findUserByEmail(email);
+    //         done(null, findUser)
+    // } 
+    // catch (error) {
+    //     done(error, null)
+    // }
+    // })
 
 }
 

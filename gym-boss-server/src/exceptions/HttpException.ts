@@ -19,4 +19,8 @@ export class HttpException extends Error {
     return new HttpException(StatusCode.INTERNAL_SERVER_ERROR, ReasonMessage.INTERNAL_SERVER_ERROR);
   }
 
+  static AUTH_ERROR(message: any = ReasonMessage.UNAUTHORIZED):HttpException{
+    return new HttpException(StatusCode.UNAUTHORIZED,message);
+  }
+
 }

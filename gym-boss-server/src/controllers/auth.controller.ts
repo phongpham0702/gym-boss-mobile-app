@@ -6,7 +6,7 @@ import { RequestWithUser } from '@interfaces/auth.interface';
 import { User } from '@interfaces/users.interface';
 import { AuthService } from '@services/auth.service';
 import SuccessResponse from '@/utils/successResponse.util';
-import { logger } from '@/utils/logger';
+import passport from 'passport';
 
 export class AuthController {
   public auth = Container.get(AuthService);
@@ -14,20 +14,16 @@ export class AuthController {
   public signUp = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userData: User = req.body;
-      const signUpUserData: User = await this.auth.signup(userData, req.body.userName);
+      const signUpUserData: User = await this.auth.signup(userData);
       
-      const {_id, 
-        password, 
-        __v, 
-        ...responseData } = signUpUserData["_doc"]
-
-      SuccessResponse.CREATED({
-        message: "Sign up success",
-        userData:{
-          userId: _id.toString(),
-          ...responseData
-        }
-      }).send(res)
+      if(signUpUserData){
+        SuccessResponse.CREATED({
+            message: "Sign up success",   
+        }).send(res)
+      }
+      else{
+        throw HttpException.SERVER_ERROR();
+      }
     } catch (error) {
       next(error);
     }
@@ -43,11 +39,21 @@ export class AuthController {
     }
   };
 
-  public handleGoogleAuth = async(error: Error,req: Request, res: Response, next: NextFunction ) => {
-    if(error) next(error);
-
-    res.status(200).json({message:"hello"})
-  }
+  public handleGoogleAuth = async(req: Request, res: Response, next: NextFunction ) => {
+    passport.authenticate('google',{
+        failWithError:true
+      },
+      (err, data) => {
+      if (err || req.query.error) {
+        next(HttpException.AUTH_ERROR());
+      }
+      else{
+        return SuccessResponse.OK({
+            ...data
+        }).send(res);
+      }
+    })(req,res,next)
+}
 
   public logOut = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
