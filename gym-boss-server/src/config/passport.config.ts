@@ -17,7 +17,7 @@ export function configurePassport(passport:PassportStatic){
             try {
 
                const findUser = await findUserByEmail(profile._json.email,{_id:1});
-               console.log(findUser);
+               
                if(!findUser){
                 const newUser: User = {
                     email: profile._json.email,

@@ -18,7 +18,6 @@ export const ErrorMiddleware = (error: HttpException, req: Request, res: Respons
   } catch (error) {
     return res.status(500).json({
       status: 'Error',
-      code: status,
       message: error.message,
     });
   }

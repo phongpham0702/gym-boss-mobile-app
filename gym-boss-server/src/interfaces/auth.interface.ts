@@ -4,7 +4,6 @@ import { User } from '@interfaces/users.interface';
 export interface DataStoredInToken {
   userId: string;
   userEmail: string;
-  isUpdateProfile:boolean;
 }
 
 export interface TokenData {

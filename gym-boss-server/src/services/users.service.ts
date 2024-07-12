@@ -6,11 +6,22 @@ import { UserModel } from '@models/users.model';
 
 @Service()
 export class UserService {
+
+  public async updateUserProfile(userId:string , updateSet:object) {
+
+    const updateProfile = UserModel.updateOne({
+      _id: userId
+    },
+    updateSet
+  );
+    return updateProfile;
+  }
+
   public async findAllUser(): Promise<User[]> {
     const users: User[] = await UserModel.find();
     return users;
   }
-
+  
   public async findUserById(userId: string): Promise<User> {
     const findUser: User = await UserModel.findOne({ _id: userId });
     if (!findUser) throw new HttpException(409, "User doesn't exist");

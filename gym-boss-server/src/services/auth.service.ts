@@ -28,11 +28,10 @@ export class AuthService {
     const tokenDataPack: DataStoredInToken = {
       userId: findUser._id,
       userEmail: findUser.email, 
-      isUpdateProfile: findUser.isUpdatedProfile
     }
 
     const accessToken:string = createAccessToken(tokenDataPack);
-    const refreshToken:string = createRefreshToken(tokenDataPack);
+    const refreshToken:string = await createRefreshToken(tokenDataPack);
     return{
       accessToken,
       refreshToken,
@@ -55,12 +54,11 @@ export class AuthService {
     const tokenDataPack: DataStoredInToken = {
       userId: findUser._id,
       userEmail: findUser.email, 
-      isUpdateProfile: findUser.isUpdatedProfile
     }
 
     const accessToken:string = createAccessToken(tokenDataPack);
-    const refreshToken:string = createRefreshToken(tokenDataPack);
-
+    const refreshToken:string = await createRefreshToken(tokenDataPack);
+    
     return{
       accessToken,
       refreshToken,

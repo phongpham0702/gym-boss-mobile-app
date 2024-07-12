@@ -22,7 +22,6 @@ export const ValidationMiddleware = (type: any, skipMissingProperties = false, w
         next();
       })
       .catch((errors: ValidationError[]) => {
-        console.log(errors);
         const message = errors.map((error: ValidationError) => 
         { 
           const errorData = {

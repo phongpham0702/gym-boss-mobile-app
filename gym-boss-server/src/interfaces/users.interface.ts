@@ -12,4 +12,5 @@ export interface User {
   isUpdatedProfile?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
+  __v?:any;
 }
