@@ -7,7 +7,7 @@ export class FacilityRoute implements Routes{
     public path = "/facilities";
     public router = Router();
     public facilityController = new FacilityController();
-
+    
     constructor() {
         this.initializeRoutes();
     }

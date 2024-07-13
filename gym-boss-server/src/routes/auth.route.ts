@@ -16,12 +16,6 @@ export class AuthRoute implements Routes {
   }
 
   private initializeRoutes() {
-    this.router.post("/add-exercise", async (req,res,next) => {
-      
-      await ExerciseModel.create({...req.body})
-
-      res.status(200).json({message:"add exercises"})
-    })
     this.router.post("/signup", ValidationMiddleware(CreateUserDto), this.auth.signUp);
     this.router.post("/login", ValidationMiddleware(LoginDto), this.auth.logIn);
     this.router.get("/login/google", passport.authenticate("google", {scope: ['profile', 'email']}))
