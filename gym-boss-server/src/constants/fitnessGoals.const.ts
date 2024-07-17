@@ -4,7 +4,7 @@ interface FitnesstGoalObject {
 };
 
 
-const fitnessGoals: FitnesstGoalObject[] = [
+const fitnessGoals:readonly FitnesstGoalObject[] = [
     {
         id: 1,
         name:"Tăng cơ"

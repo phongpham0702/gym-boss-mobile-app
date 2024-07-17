@@ -33,6 +33,7 @@
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "reflect-metadata": "^0.2.2",
+    "slug": "^9.1.0",
     "typedi": "^0.10.0",
     "winston": "^3.13.0",
     "winston-daily-rotate-file": "^5.0.0"

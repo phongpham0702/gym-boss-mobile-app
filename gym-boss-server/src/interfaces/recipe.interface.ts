@@ -1,22 +1,22 @@
-export interface Recipe{
+export interface IRecipe{
     _id?: string;
-    dishName?:string;
-    dishCalories?:number;
-    cookingTime?:{
-        prep:number,
-        cooking:number
-    };
-    dishNutrition?:{
-        protein: string,
-        fats: string,
-        carbs: string,
-        sodium: string,
-        fiber: string,
-        sugar: string,
+    recipeName:string;
+    slug:string;
+    recipeCalories:number;
+    recipeCategory:string;
+    prepTime?:number;
+    cookTime?:number;
+    recipeNutrition?:{
+        protein:number,
+        fats:number,
+        carbs:number,
+        sodium:number,
+        fiber:number,
+        sugar:number,
     },
-    dishIngredients?:Array<String>,
-    cookingSteps?:Array<String>,
-    dishImages?:Array<String>,
+    recipeIngredients?:Array<String>;
+    recipeSteps?:Array<String>;
+    dishImages?:Array<String>;
     createdAt?: Date;
-    updatedAt?: Date
+    updatedAt?: Date;
 }

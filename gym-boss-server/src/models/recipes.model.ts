@@ -1,59 +1,70 @@
 import { model, Schema, Document } from 'mongoose';
-import { Recipe } from '@/interfaces/recipe.interface';
+import { IRecipe } from '@/interfaces/recipe.interface';
+import slug from "slug";
 const RecipeSchema: Schema = new Schema({
 
-    dishName:{
+    recipeName:{
         type:String,
         required:true
     },
-    dishCalories:{
+
+    slug:{
+        type:String,
+        required:true,
+        unique:true
+    },
+
+    recipeCalories:{
+        type:Number,
+        required:true
+    },
+    recipeCategory:{
+        type:String
+    },
+    prepTime:{
+        type:Number,
+        required:true
+    },
+    cookTime:{
         type:Number,
         required:true
     },
 
-    cookingTime:{
-        type:{
-            prep: Number,
-            cooking:Number,
-        },
-        required:true
-    },
-
-    dishNutrition:{
+    recipeNutrition:{
         type:{  
                 protein: {
-                    type: String,
+                    type: Number,
                     required:true
                 },
                 fats: {
-                    type: String,
+                    type: Number,
                     required:true
                 },
                 carbs: {
-                    type: String,
+                    type: Number,
                     required:true
                 },
                 sodium: {
-                    type: String,
+                    type: Number,
                     required:true
                 },
                 fiber: {
-                    type: String,
+                    type: Number,
                     required:true
                 },
                 sugar: {
-                    type: String,
+                    type: Number,
                     required:true
                 },
         },
         required:true,
     },
 
-    dishIngredients:{
+    recipeIngredients:{
         type: Array<String>,
         default:[]
     },
-    cookingSteps:{
+    recipeSteps:{
         type:Array<String>,
         default:[]
     },
@@ -67,4 +78,11 @@ const RecipeSchema: Schema = new Schema({
     timestamps: true,
 });
 
-export const RecipeModel = model<Recipe & Document>('Recipes',RecipeSchema);
+RecipeSchema.pre("validate", function(next) {
+    if (this.recipeName) {
+        this.slug = slug(this.recipeName, { lower: true });
+    }
+    next();
+})
+
+export const RecipeModel = model<IRecipe & Document>('Recipes',RecipeSchema);

@@ -14,5 +14,6 @@ export class ExerciseRoute implements Routes{
     private initializeRoutes(){
         this.router.use(AuthMiddleware);
         this.router.get("/:page",this.exerciseController.getExerciseList)
+        this.router.get("/detail/:id", this.exerciseController.getExerciseDetail)
     }
 }
