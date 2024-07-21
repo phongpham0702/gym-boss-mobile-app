@@ -69,4 +69,24 @@ export class ExerciseController {
 
     }
 
+    public getExerciseDetail = async(req:Request,res:Response,next:NextFunction) => {
+        try {
+            if(!req.params.id) throw HttpException.BAD_REQUEST("Missing ID");
+
+            const exerciseDetail = await this.exerciseService.getExerciseDetail(req.params.id)
+
+            if(!exerciseDetail) {
+                throw HttpException.BAD_REQUEST("Cannot find this exercise ID")
+            }
+            else{
+                SuccessResponse.OK({
+                    exerciseDetail
+                }).send(res)
+            }
+        
+        } catch (error) {
+            next(error)
+        }
+    }
+
 }
