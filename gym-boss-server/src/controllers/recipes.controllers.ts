@@ -16,22 +16,26 @@ export class RecipeController{
 
             let category:string = null
 
-            switch (req.query.category.toString().toLowerCase()) {
-                case "breakfast":
-                    category = "Breakfast";
-                    break;
-                case "dinner":
-                    category = "Dinner";
-                    break;
-                case "salad":
-                    category = "Salad";
-                    break;
-                case "snack":
-                    category = "Snack";
-                    break;
-                default:
-                    break;
+            if(req.query.category){
+                switch (req.query.category.toString().toLowerCase()) {
+                    case "breakfast":
+                        category = "Breakfast";
+                        break;
+                    case "dinner":
+                        category = "Dinner";
+                        break;
+                    case "salad":
+                        category = "Salad";
+                        break;
+                    case "snack":
+                        category = "Snack";
+                        break;
+                    default:
+                        break;
+                }
             }
+
+            
 
 
             const findRecipes = await this.recipeService.getRecipes(pageNum,category);
