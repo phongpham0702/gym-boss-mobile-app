@@ -1,5 +1,5 @@
-import { MatchPassword, IsInFitnessGoalList } from '@/decorators/user.decorators';
-import { IsEmail, IsString, IsInt, IsNotEmpty, MinLength, MaxLength, IsIn, Max, Min} from 'class-validator';
+import { MatchPassword, IsInFitnessGoalList, IsExistExercise } from '@/decorators/user.decorators';
+import { IsEmail, IsString, IsInt, IsNotEmpty, MinLength, MaxLength, IsIn, Max, Min, IsMongoId, IsOptional} from 'class-validator';
 
 export class CreateUserDto {
   @IsEmail()
@@ -54,36 +54,39 @@ export class FirstUpdateProfileDto{
 
 }
 
-
-export class UpdateUserDto {
-  @IsString()
-  @IsNotEmpty()
-  @MinLength(9)
-  @MaxLength(32)
-  public password: string;
+export class SaveTrainingHistory{
+  @IsMongoId({message:"Invalid exercise id"})
+  @IsExistExercise('exerciseId',{message: "Cannot find this exercise"})
+  public exerciseId: string
 }
 
-
-// @IsString()
-// @IsNotEmpty()
-// public userName: string;
-
-
-// @IsString()
-// @IsIn(['Nam', 'Nữ'])
-// public userGender: string;
-
-// @IsInt()
-// @Min(1)
-// @Max(100)
-// public userAge: number;
-
-// @IsInt()
-// public currentHeight: number;
-
-// @IsInt()
-// public currentWeight: number;
-
-// @IsInt()
-// @IsInFitnessGoalList('fitnessGoalId',{message: "Invalid fitness goal"})
-// public fitnessGoalId: number;
+export class UpdateUserDto {
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  public userName: string;
+  
+  @IsOptional()
+  @IsString()
+  @IsIn(['Nam', 'Nữ'])
+  public userGender: string;
+  
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  public userAge: number;
+  
+  @IsOptional()
+  @IsInt()
+  public currentHeight: number;
+  
+  @IsOptional()
+  @IsInt()
+  public currentWeight: number;
+  
+  @IsOptional()
+  @IsInt()
+  @IsInFitnessGoalList('fitnessGoalId',{message: "Invalid fitness goal"})
+  public fitnessGoalId: number;
+}

@@ -34,10 +34,7 @@ export class RecipeController{
                         break;
                 }
             }
-
             
-
-
             const findRecipes = await this.recipeService.getRecipes(pageNum,category);
             
             if(pageNum > findRecipes.totalPages) throw HttpException.BAD_REQUEST("Page does not exist")

@@ -6,6 +6,7 @@ import { UserService } from '@services/users.service';
 import SuccessResponse from '@/utils/successResponse.util';
 import { RequestWithUser } from '@/interfaces/auth.interface';
 import fitnessGoals from '@/constants/fitnessGoals.const';
+import { UpdateUserDto } from '@/dtos/users.dto';
 
 export class UserController {
   public userService = Container.get(UserService);
@@ -87,59 +88,68 @@ export class UserController {
     }
   }
 
+  public updateProfile = async(req: RequestWithUser, res: Response, next: NextFunction) => {
+    try 
+    { 
 
-/*   public getUsers = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const findAllUsersData: User[] = await this.user.findAllUser();
+      const updateSet = {
+        userName: req.body.userName,
+        userGender: req.body.userGender,
+        userAge:req.body.userAge,
+        currentHeight:req.body.currentHeight,
+        currentWeight: req.body.currentWeight,
+        fitnessGoal: req.body.fitnessGoals,
+      }
+      
+      const updatedResult = await this.userService.updateUserProfile(req.user._id,updateSet);
 
-      res.status(200).json({ data: findAllUsersData, message: 'findAll' });
-    } catch (error) {
-      next(error);
+      SuccessResponse.CREATED({
+        message: "Updated profile successfully"
+      }).send(res)
+
+    } 
+    catch (error) {
+      next(error)  
     }
-  };
+  }
 
-  public getUserById = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const userId: string = req.params.id;
-      const findOneUserData: User = await this.user.findUserById(userId);
+  public completeExercise = async(req: RequestWithUser, res: Response, next: NextFunction) => {
+    try 
+    { 
+      if(!req.body.exerciseId) throw HttpException.BAD_REQUEST("Missing exercise ID!")
 
-      res.status(200).json({ data: findOneUserData, message: 'findOne' });
-    } catch (error) {
-      next(error);
+      await this.userService.saveTrainingHistory(req.user._id,req.body.exerciseId);
+
+      SuccessResponse.CREATED({
+        message: "Add to training history successfully"
+      }).send(res)
+
+    } 
+    catch (error) {
+      next(error)  
     }
-  };
+  }
 
-  public createUser = async (req: Request, res: Response, next: NextFunction) => {
+  public getTrainingHistory = async(req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
-      const userData: User = req.body;
-      const createUserData: User = await this.user.createUser(userData);
+      const pageNum:number = parseInt(req.params.page)
+      if(Number.isNaN(pageNum)) throw HttpException.BAD_REQUEST("Invalid page number")
+      
+      let sortDate:number = parseInt(req.query.sort.toString());
+      
+      if(Number.isNaN(sortDate)) sortDate = -1
 
-      res.status(201).json({ data: createUserData, message: 'created' });
-    } catch (error) {
-      next(error);
+      const trainingHistory = await this.userService.getTrainingHistory(req.user._id, pageNum,sortDate)
+      
+        SuccessResponse.OK({
+          ...trainingHistory
+        }).send(res)
+    }   
+    catch (error) {
+      next(error)  
     }
-  };
 
-  public updateUser = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const userId: string = req.params.id;
-      const userData: User = req.body;
-      const updateUserData: User = await this.user.updateUser(userId, userData);
 
-      res.status(200).json({ data: updateUserData, message: 'updated' });
-    } catch (error) {
-      next(error);
-    }
-  };
+  }
 
-  public deleteUser = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const userId: string = req.params.id;
-      const deleteUserData: User = await this.user.deleteUser(userId);
-
-      res.status(200).json({ data: deleteUserData, message: 'deleted' });
-    } catch (error) {
-      next(error);
-    }
-  }; */
 }
