@@ -27,33 +27,6 @@ export class LoginDto{
   public password: string;
 }
 
-
-export class FirstUpdateProfileDto{
- @IsString()
- @IsNotEmpty()
- public userName: string;
-
- @IsString()
- @IsIn(['Nam', 'Nữ'])
- public userGender: string;
-
- @IsInt()
- @Min(1)
- @Max(100)
- public userAge: number;
-
- @IsInt()
- public currentHeight: number;
-
- @IsInt()
- public currentWeight: number;
-
- @IsInt()
- @IsInFitnessGoalList('fitnessGoalId',{message: "Invalid fitness goal"})
- public fitnessGoalId: number;
-
-}
-
 export class SaveTrainingHistory{
   @IsMongoId({message:"Invalid exercise id"})
   @IsExistExercise('exerciseId',{message: "Cannot find this exercise"})

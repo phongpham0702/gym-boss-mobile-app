@@ -1,6 +1,6 @@
 import { model, Schema, Document } from 'mongoose';
 
-const DailyPlanSchema: Schema = new Schema({
+const DailyMealSchema: Schema = new Schema({
 
     ownerId:{
         type:Schema.Types.ObjectId,
@@ -31,31 +31,6 @@ const DailyPlanSchema: Schema = new Schema({
         required:true,
         ref:"Recipes"
     },
-
-    upperBodyExercise:{
-        type:Schema.Types.ObjectId,
-        required:true,
-        ref:"Exercises"
-    },
-
-    coreExercise:{
-        type:Schema.Types.ObjectId,
-        required:true,
-        ref:"Exercises"
-    },
-
-    lowerBodyExercise:{
-        type:Schema.Types.ObjectId,
-        required:true,
-        ref:"Exercises"
-    },
-
-    totalBodyExercise:{
-        type:Schema.Types.ObjectId,
-        required:true,
-        ref:"Exercises"
-    }
-
 })
 
-export const dailyPlan = model<Recipe & Document>
+export const dailyMealModel = model<Document>('DailyMeals',DailyMealSchema);

@@ -19,7 +19,7 @@ export class UserRoute implements Routes {
     this.router.use(AuthMiddleware)
     this.router.route("/first-login")
     .get(this.user.getFirstLoginData)
-    .put(this.user.firstLoginUpdate)
+    .put(ValidationMiddleware(UpdateUserDto), this.user.firstLoginUpdate)
     
     this.router.use(isValidProfile)
     this.router.route("/profile")
@@ -29,6 +29,7 @@ export class UserRoute implements Routes {
     this.router.get("/profile/training-history/:page",this.user.getTrainingHistory)
     this.router.post("/exercise-complete",ValidationMiddleware(SaveTrainingHistory),this.user.completeExercise)
 
+    //this.router.get("dailymeal",this.user.dailyMeal)
     /* this.router.post("/first-login") */
     /* this.router.get("/", this.user.getUsers);
     this.router.get("/:id", this.user.getUserById);

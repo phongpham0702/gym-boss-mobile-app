@@ -152,4 +152,16 @@ export class UserController {
 
   }
 
+  public dailyMeal = async(req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+      SuccessResponse.CREATED({
+        message: "Add to training history successfully"
+      }).send(res)
+
+    } 
+    catch (error) {
+      next(error)  
+    }
+  }
+
 }
