@@ -28,7 +28,7 @@ export class UserRoute implements Routes {
 
     this.router.get("/profile/training-history/:page",this.user.getTrainingHistory)
     this.router.post("/exercise-complete",ValidationMiddleware(SaveTrainingHistory),this.user.completeExercise)
-
+    //this.router
     //this.router.get("dailymeal",this.user.dailyMeal)
     /* this.router.post("/first-login") */
     /* this.router.get("/", this.user.getUsers);

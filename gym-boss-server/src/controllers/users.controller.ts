@@ -24,8 +24,11 @@ export class UserController {
         ...data
       } = req.user
 
+      const trainingProfile = await this.userService.getUserCalBurned(_id)
+
       SuccessResponse.OK({
         userId: _id,
+        trainingProfile,
         ...data,
         fitnessGoal: fitnessGoals.find((v) =>{return v.id === fitnessGoalId})
       }).send(res)

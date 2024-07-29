@@ -1,3 +1,4 @@
+import { ITrainingHistory } from '@/interfaces/training-history.interface';
 import { model, Schema, Document } from 'mongoose';
 
 const TrainingHistorySchema: Schema = new Schema({
@@ -17,4 +18,4 @@ const TrainingHistorySchema: Schema = new Schema({
     timestamps:true
 });
 
-export const  TrainingHistoryModel = model<Document>('TrainingHistory',  TrainingHistorySchema);
+export const  TrainingHistoryModel = model<ITrainingHistory & Document>('TrainingHistory',  TrainingHistorySchema);

@@ -1,3 +1,4 @@
+import { Exercise } from '@/interfaces/exercise.interface';
 import { hash } from 'bcrypt';
 import { Service } from 'typedi';
 import { HttpException } from '@/exceptions/HttpException';
@@ -5,6 +6,8 @@ import { User } from '@interfaces/users.interface';
 import { UserModel } from '@models/users.model';
 import { TrainingHistoryModel } from '@/models/training-history.model';
 import { trainingHistoryItemPerPage } from '@/config/page.config';
+import { ITrainingHistory } from '@/interfaces/training-history.interface';
+import { ObjectId } from 'mongoose';
 
 @Service()
 export class UserService {
@@ -57,5 +60,29 @@ export class UserService {
       trainingHistory: getUserTrainingHistory
     }
   }
+  
+  public async getUserCalBurned(userId:string){
+    const userTrainingHistory: Array<ITrainingHistory> = await TrainingHistoryModel.find({
+      userId: userId
+    })
+    .populate({
+      path:"exercise",
+      select:["exerciseDuration","caloriesBurned"]
+    })
+    .lean()
 
+    let calBurned:number = 0, trainingDur:number = 0
+    
+    for(let item of userTrainingHistory){
+      let ex:Exercise = item.exercise as Exercise
+      calBurned += ex. caloriesBurned;
+      trainingDur += ex.exerciseDuration;
+    }
+
+    return {
+      trainingCount: userTrainingHistory.length,
+      caloBurned:calBurned,
+      trainingDuration:trainingDur
+    }
+  }
 }
