@@ -57,4 +57,23 @@ export class ExerciseService{
         return findExercise;
     }
 
+    public async getRandomExercise(limit:number){
+
+        const exerciseList = await ExerciseModel.aggregate([
+            {
+                $sample:{size:limit}
+            },
+            {
+                $project:{
+                    "exerciseTarget._id":0,
+                    "exerciseGoal._id":0,
+                    "createdAt":0,
+                    "updatedAt":0,
+                    "__v":0
+                }
+            }
+        ])
+
+    }
+
 }

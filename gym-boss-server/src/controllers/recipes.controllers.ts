@@ -71,4 +71,16 @@ export class RecipeController{
         
     }
 
+    public getCategory = async (req:Request ,res: Response,next: NextFunction)=> {
+        try {
+            
+            SuccessResponse.OK({
+                categoryList: await this.recipeService.getCategory()
+            }).send(res)
+
+        } catch (error) {
+            next(error)
+        }
+    }
+
 }   

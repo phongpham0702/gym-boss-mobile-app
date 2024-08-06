@@ -45,4 +45,30 @@ export class RecipeService{
 
     }
 
+    public async getCategory(){
+        const recipeCategory = await RecipeModel.aggregate([
+            {
+                $group:{
+                    _id: "$recipeCategory",
+                    count: {$count:{}}
+                }
+
+            },
+            {
+                $project:{
+                    _id:0,
+                    categoryName:"$_id",
+                    recipeCount:"$count"
+                }
+            },
+            {
+                $sort:{
+                    categoryName: 1
+                }
+            }
+        ])
+
+        return recipeCategory;
+    }
+
 }
