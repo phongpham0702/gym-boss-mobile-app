@@ -33,6 +33,8 @@ export class AuthService {
     const accessToken:string = createAccessToken(tokenDataPack);
     const refreshToken:string = await createRefreshToken(tokenDataPack);
     return{
+      userEmail:findUser.email,
+      userName:findUser.userName,
       accessToken,
       refreshToken,
       isUpdateProfile: findUser.isUpdatedProfile
@@ -40,6 +42,8 @@ export class AuthService {
   }
 
   public async login(userData: User): Promise<{ 
+    userEmail:string;
+    userName:string;
     accessToken: string; 
     refreshToken: string; 
     isUpdateProfile: boolean; 
@@ -60,6 +64,8 @@ export class AuthService {
     const refreshToken:string = await createRefreshToken(tokenDataPack);
     
     return{
+      userEmail:findUser.email,
+      userName:findUser.userName,
       accessToken,
       refreshToken,
       isUpdateProfile: findUser.isUpdatedProfile
