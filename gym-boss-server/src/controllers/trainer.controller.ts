@@ -21,4 +21,20 @@ export class TrainerController{
         
     }
 
+    public getTrainerDetail = async(req:Request ,res: Response,next: NextFunction) => {
+
+        try {
+
+            if(!req.params.id) throw HttpException.BAD_REQUEST("Missing trainer id")
+
+            SuccessResponse.OK({
+                trainerDetail: await this.trainerService.TrainerDetail(req.params.id)
+            }).send(res);
+            
+        } 
+        catch (error) {
+            next(error)    
+        }
+
+    }
 }   

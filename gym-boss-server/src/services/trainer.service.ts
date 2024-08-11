@@ -20,4 +20,12 @@ export class TrainerService{
         return trainerList;
     }
 
+    public async TrainerDetail(trainerID){
+        const trainer:Trainer = await TrainerModel.findOne({
+            _id:trainerID
+        }).lean()
+
+        return trainer;
+    }
+
 }

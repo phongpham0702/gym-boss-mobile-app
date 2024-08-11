@@ -15,5 +15,6 @@ export class TrainerRoute implements Routes{
     private initializeRoutes(){
         this.router.use(AuthMiddleware);
         this.router.get("/", this.trainerController.getTrainerList);
+        this.router.get("/detail/:id", this.trainerController.getTrainerDetail)
     }
 }
