@@ -74,10 +74,21 @@ export class RecipeController{
 
     public getCategory = async (req:Request ,res: Response,next: NextFunction)=> {
         try {
-            const mailer = new Mailer();
-            console.log(typeof(mailer));
+            
             SuccessResponse.OK({
                 categoryList: await this.recipeService.getCategory()
+            }).send(res)
+
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public getSuggestList = async (req:Request ,res: Response,next: NextFunction)=> {
+        try {
+            
+            SuccessResponse.OK({
+                categorySuggestList: await this.recipeService.getSuggest()
             }).send(res)
 
         } catch (error) {
