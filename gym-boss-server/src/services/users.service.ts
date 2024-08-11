@@ -5,9 +5,10 @@ import { HttpException } from '@/exceptions/HttpException';
 import { User } from '@interfaces/users.interface';
 import { UserModel } from '@models/users.model';
 import { TrainingHistoryModel } from '@/models/training-history.model';
-import { trainingHistoryItemPerPage } from '@/config/page.config';
+import { mealHistoryItemPerPage, trainingHistoryItemPerPage } from '@/config/page.config';
 import { ITrainingHistory } from '@/interfaces/training-history.interface';
 import { ObjectId } from 'mongoose';
+import { MealHistoryModel } from '@/models/meal-history.model';
 
 @Service()
 export class UserService {
@@ -61,6 +62,44 @@ export class UserService {
     }
   }
   
+  public async saveMealHistory(userId:string,recipeId:string){
+    const createMealHistory = await MealHistoryModel.create({
+      userId: userId,
+      recipe: recipeId
+    })
+
+    return createMealHistory;
+  }
+
+  public async getMealHistory(userId:string, currentPage:number = 1 ,sortDate:any= -1){
+    const getUserMealHistory = await MealHistoryModel.find({
+      userId: userId
+    },
+    {
+      _id:0,
+      updatedAt:0,
+      __v:0
+    })
+    .sort({createdAt: sortDate})
+    .skip((currentPage*mealHistoryItemPerPage)-mealHistoryItemPerPage )
+    .limit(mealHistoryItemPerPage)
+    .populate({
+      path:"recipe",
+      select:["-createdAt","-updatedAt","-__v","-recipeIngredients","-recipeSteps"]
+    })
+    .lean()
+
+    const totalItem:number = await MealHistoryModel.find({userId: userId}).countDocuments()
+
+    return {
+      currentPage,
+      totalItem,
+      itemPerPage:mealHistoryItemPerPage,
+      totalPage: Math.ceil(totalItem/mealHistoryItemPerPage),
+      mealHistory: getUserMealHistory
+    }
+  }
+
   public async getUserCalBurned(userId:string){
     const userTrainingHistory: Array<ITrainingHistory> = await TrainingHistoryModel.find({
       userId: userId

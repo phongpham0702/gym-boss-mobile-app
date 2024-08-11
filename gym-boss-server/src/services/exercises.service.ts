@@ -57,22 +57,64 @@ export class ExerciseService{
         return findExercise;
     }
 
-    public async getRandomExercise(limit:number){
+    public async getRandomExercise(limit:number=1){
 
-        const exerciseList = await ExerciseModel.aggregate([
+        const pipeline = [
+            { $match: { "exerciseTarget.targetId": 1 } }, //Full-body
+            { $sample: { size: limit } }, 
+            { $unionWith: {
+                coll: "exercises",
+                pipeline: [
+                    { $match: { "exerciseTarget.targetId": 2 } }, //Belly
+                    { $sample: { size: limit } }
+                ]
+            }},
+            { $unionWith: {
+                coll: "exercises",
+                pipeline: [
+                    { $match: { "exerciseTarget.targetId": 3 } }, //Upper
+                    { $sample: { size: limit } }
+                ]
+            }},
+            { $unionWith: {
+                coll: "exercises",
+                pipeline: [
+                    { $match: { "exerciseTarget.targetId": 4 } }, //Lower
+                    { $sample: { size: limit } }
+                ]
+            }},
             {
-                $sample:{size:limit}
-            },
-            {
-                $project:{
-                    "exerciseTarget._id":0,
-                    "exerciseGoal._id":0,
-                    "createdAt":0,
-                    "updatedAt":0,
-                    "__v":0
-                }
+                $project:{__v:0,createdAt:0,updatedAt:0}
             }
-        ])
+        ]
+
+        const categorySuggestList:Exercise[] = await ExerciseModel.aggregate(pipeline)
+        
+        let orderByCategory = {
+            fullBody:[],
+            core:[],
+            upperBody:[],
+            lowerBody:[]
+        }
+
+        for(let r of categorySuggestList){
+            switch (r.exerciseTarget.targetId) {
+                case 2:
+                    orderByCategory.core.push(r)
+                    break;
+                case 3:
+                    orderByCategory.upperBody.push(r)
+                    break;
+                case 4:
+                    orderByCategory.lowerBody.push(r)
+                    break;
+                default:
+                    orderByCategory.fullBody.push(r)
+                    break;
+            }
+        }
+
+        return {...orderByCategory};
 
     }
 

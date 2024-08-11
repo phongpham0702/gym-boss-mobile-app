@@ -89,4 +89,15 @@ export class ExerciseController {
         }
     }
 
+    public getSuggestExercise = async(req:Request,res:Response,next:NextFunction) => {
+        try {
+            
+            SuccessResponse.OK({
+                categorySuggestList: await this.exerciseService.getRandomExercise()
+            }).send(res)
+
+        } catch (error) {
+            next(error)
+        }
+    }
 }

@@ -3,6 +3,7 @@ import { HttpException } from "@/exceptions/HttpException";
 import SuccessResponse from '@/utils/successResponse.util';
 import { Container } from 'typedi';
 import { RecipeService } from '@/services/recipes.service';
+import { Mailer } from '@/utils/mailer.util';
 
 export class RecipeController{
     public recipeService:RecipeService= Container.get(RecipeService);
@@ -76,6 +77,18 @@ export class RecipeController{
             
             SuccessResponse.OK({
                 categoryList: await this.recipeService.getCategory()
+            }).send(res)
+
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    public getSuggestList = async (req:Request ,res: Response,next: NextFunction)=> {
+        try {
+            
+            SuccessResponse.OK({
+                categorySuggestList: await this.recipeService.getSuggest()
             }).send(res)
 
         } catch (error) {

@@ -71,4 +71,65 @@ export class RecipeService{
         return recipeCategory;
     }
 
+    public async getSuggest(limit:number = 1){
+        const pipeline = [
+            { $match: { recipeCategory: "Breakfast" } },
+            { $sample: { size: limit } }, 
+            { $unionWith: {
+                coll: "recipes",
+                pipeline: [
+                    { $match: { recipeCategory: "Snack" } },
+                    { $sample: { size: limit } }
+                ]
+            }},
+            { $unionWith: {
+                coll: "recipes",
+                pipeline: [
+                    { $match: { recipeCategory: "Salad" } },
+                    { $sample: { size: limit } }
+                ]
+            }},
+            { $unionWith: {
+                coll: "recipes",
+                pipeline: [
+                    { $match: { recipeCategory: "Dinner" } },
+                    { $sample: { size: limit } }
+                ]
+            }},
+            {
+                $project:{__v:0,createdAt:0,updatedAt:0}
+            }
+        ]
+
+        const categorySuggestList:IRecipe[] = await RecipeModel.aggregate(pipeline)
+        
+        let orderByCategory = {
+            Breakfast:[],
+            Snack:[],
+            Salad:[],
+            Dinner:[]
+        }
+
+        for(let r of categorySuggestList){
+            switch (r.recipeCategory) {
+                case "Breakfast":
+                    orderByCategory.Breakfast.push(r)
+                    break;
+                case "Snack":
+                    orderByCategory.Snack.push(r)
+                    break;
+                case "Salad":
+                    orderByCategory.Salad.push(r)
+                    break;
+                default:
+                    orderByCategory.Dinner.push(r)
+                    break;
+            }
+        }
+
+        return {...orderByCategory};
+    }
 }
+
+
+

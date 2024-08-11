@@ -155,6 +155,45 @@ export class UserController {
 
   }
 
+  public completeMeal = async(req: RequestWithUser, res: Response, next: NextFunction) => {
+    try 
+    { 
+
+        await this.userService.saveMealHistory(req.user._id,req.body.recipeId);
+
+        SuccessResponse.CREATED({
+          message: "Add to meal history successfully"
+        }).send(res)
+
+    } 
+    catch (error) {
+      next(error)  
+    } 
+  }
+
+  public getMealHistory = async(req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+      const pageNum:number = parseInt(req.params.page)
+      if(Number.isNaN(pageNum)) throw HttpException.BAD_REQUEST("Invalid page number")
+      
+      let sortDate:number = parseInt(req.query.sort.toString());
+      
+      if(Number.isNaN(sortDate)) sortDate = -1
+
+      const mealHistory = await this.userService.getMealHistory(req.user._id, pageNum,sortDate)
+      
+        SuccessResponse.OK({
+          ...mealHistory
+        }).send(res)
+    }   
+    catch (error) {
+      next(error)  
+    }
+
+
+  }
+
+
   public dailyMeal = async(req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
       SuccessResponse.CREATED({

@@ -1,5 +1,5 @@
-import { MatchPassword, IsInFitnessGoalList, IsExistExercise } from '@/decorators/user.decorators';
-import { IsEmail, IsString, IsInt, IsNotEmpty, MinLength, MaxLength, IsIn, Max, Min, IsMongoId, IsOptional} from 'class-validator';
+import { MatchPassword, IsInFitnessGoalList, IsExistExercise, IsExistRecipe } from '@/decorators/user.decorators';
+import { IsEmail, IsString, IsInt, IsNotEmpty, MinLength, MaxLength, IsIn, Max, Min, IsMongoId, IsOptional, IsEmpty} from 'class-validator';
 
 export class CreateUserDto {
   @IsEmail()
@@ -32,6 +32,13 @@ export class SaveTrainingHistory{
   @IsExistExercise('exerciseId',{message: "Cannot find this exercise"})
   public exerciseId: string
 }
+
+export class SaveMealHistory{
+  @IsMongoId({message:"Invalid recipe id"})
+  @IsExistRecipe('recipeId',{message: "Cannot find this recipe"})
+  public recipeId: string
+}
+
 
 export class UpdateUserDto {
   @IsOptional()

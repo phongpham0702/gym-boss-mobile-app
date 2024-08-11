@@ -1,4 +1,4 @@
-import { ITrainingHistory } from '@/interfaces/training-history.interface';
+import { IMealHistory } from '@/interfaces/meal-history.interface';
 import { model, Schema, Document } from 'mongoose';
 
 const MealHistorySchema: Schema = new Schema({
@@ -8,7 +8,7 @@ const MealHistorySchema: Schema = new Schema({
         required:true,
     },
 
-    meal:{
+    recipe:{
         type: Schema.Types.ObjectId,
         required:true,
         ref:"Recipes"
@@ -18,4 +18,4 @@ const MealHistorySchema: Schema = new Schema({
     timestamps:true
 });
 
-export const  MealHistoryModel = model<ITrainingHistory & Document>('MealHistory',  MealHistorySchema);
+export const  MealHistoryModel = model<IMealHistory & Document>('MealHistory',  MealHistorySchema);

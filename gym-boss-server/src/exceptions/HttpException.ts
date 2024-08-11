@@ -23,4 +23,7 @@ export class HttpException extends Error {
     return new HttpException(StatusCode.UNAUTHORIZED,message);
   }
 
+  static NOT_ACCEPTABLE(message:any = ReasonMessage.NOT_ACCEPTABLE):HttpException{
+    return new HttpException(StatusCode.NOT_ACCEPTABLE,message);
+  }
 }
